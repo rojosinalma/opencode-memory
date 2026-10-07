@@ -12,7 +12,7 @@ import type { Plugin } from "@opencode/plugin"
 import { Database } from "bun:sqlite"
 import { mkdirSync, renameSync, writeFileSync } from "node:fs"
 import { homedir } from "node:os"
-import { basename, dirname, join } from "node:path"
+import { basename, dirname, isAbsolute, join, relative, sep } from "node:path"
 
 type Row = {
   id: number
@@ -92,9 +92,22 @@ function settingInt(key: string): number {
   return Number.isFinite(parsed) ? parsed : Number.parseInt(SETTING_DEFAULTS[key] ?? "0", 10)
 }
 
-// Project key for a location. The project directory is the git root, which is
+// First path segment below `root` when `dir` lies under it, else undefined.
+function projectUnder(root: string, dir: string): string | undefined {
+  if (!dir) return undefined
+  const rel = relative(root, dir)
+  if (!rel || rel.startsWith("..") || isAbsolute(rel)) return undefined
+  return rel.split(sep)[0] || undefined
+}
+
+// Project key for a location. A directory anywhere under ~/dev maps to the project it
+// sits in (openchamber roots sessions at <project>/data/config/chats/<date>/session-<id>/,
+// which would otherwise scope as "session-…"). Otherwise the git root's basename, which is
 // what we want; where there is no repo it falls back to the directory name.
 function scopeOf(projectDirectory: string, directory: string): string {
+  const root = join(homedir(), "dev")
+  const nested = projectUnder(root, directory) ?? projectUnder(root, projectDirectory)
+  if (nested) return nested
   const fromProject = basename(projectDirectory || "")
   if (fromProject && fromProject !== "/") return fromProject
   return basename(directory || "") || "global"
