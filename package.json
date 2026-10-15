@@ -1,0 +1,11 @@
+{
+  "name": "opencode-memory",
+  "version": "0.1.0",
+  "description": "OpenCode plugin: cross-session, cross-project memory in SQLite, injected into the system prompt",
+  "type": "module",
+  "license": "MIT",
+  "main": "index.ts",
+  "devDependencies": {
+    "@opencode/plugin": "latest"
+  }
+}
