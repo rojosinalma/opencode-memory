@@ -2,11 +2,27 @@
   "name": "opencode-memory",
   "version": "0.2.0",
   "description": "OpenCode plugin: cross-session, cross-project memory in SQLite, injected into the system prompt",
-  "type": "module",
+  "author": "rojosinalma",
   "license": "MIT",
+  "type": "module",
   "main": "index.ts",
-  "scripts": { "test": "bun test" },
+  "scripts": {
+    "test": "bun test"
+  },
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "ai-agents",
+    "memory",
+    "sqlite",
+    "llm"
+  ],
+  "homepage": "https://github.com/rojosinalma/opencode-memory",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rojosinalma/opencode-memory"
+  },
   "devDependencies": {
-    "@opencode/plugin": "latest"
+    "@opencode/plugin": "2.0.30"
   }
 }
