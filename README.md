@@ -11,16 +11,33 @@ deterministic.
 
 ## Install
 
-Clone into the global plugins directory; it is auto-discovered and takes no options:
+Clone into the global plugins directory; it is auto-discovered and works without options:
 
 ```sh
 git clone https://github.com/rojosinalma/opencode-memory ~/.config/opencode/plugins/memory
+```
+
+To set options, reference **that same path** from `opencode.jsonc` (a different path to the same
+plugin would load a second instance):
+
+```jsonc
+{
+  "plugins": [
+    { "package": "./plugins/memory", "options": { "projects_root": "~/dev" } }
+  ]
+}
 ```
 
 No runtime dependencies: SQLite comes from Bun's built-in `bun:sqlite`, `@opencode/plugin` is imported
 as types only.
 
 ## Configuration
+
+Plugin options (`opencode.jsonc`):
+
+| key | default | meaning |
+|---|---|---|
+| `projects_root` | unset | directory holding your projects; a location anywhere under it scopes to the first path segment below the root, so a session rooted deep inside a project still shares that project's memory. `~` expands |
 
 Runtime knobs live in the database's `settings` table and need no restart:
 
@@ -40,10 +57,15 @@ Environment:
 ## How it works
 
 1. `session.hook("context")` and `session.hook("compaction")` inject the block (shared facts, then the project scope, then recent titles). Pinned entries come first and are never evicted.
-2. The project key is the first path segment under `~/dev` when the location lies there (so a session rooted deep inside a project still scopes to it), else the git root's basename, else the directory name.
+2. The project key is the first path segment under `projects_root` when that is set and the location lies there, else the git root's basename, else the directory name.
 3. Session titles are recorded at end of turn from `session.execution.*` events.
+
+## Tests
+
+```sh
+bun test
+```
 
 ## Caveats
 
-- The `~/dev` projects root is currently hardcoded (`scopeOf`); outside it the git root's basename is used.
 - Loaded per location boot; running locations keep the plugin set they started with.

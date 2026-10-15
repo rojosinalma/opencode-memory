@@ -100,14 +100,28 @@ function projectUnder(root: string, dir: string): string | undefined {
   return rel.split(sep)[0] || undefined
 }
 
-// Project key for a location. A directory anywhere under ~/dev maps to the project it
-// sits in (openchamber roots sessions at <project>/data/config/chats/<date>/session-<id>/,
-// which would otherwise scope as "session-…"). Otherwise the git root's basename, which is
-// what we want; where there is no repo it falls back to the directory name.
-function scopeOf(projectDirectory: string, directory: string): string {
-  const root = join(homedir(), "dev")
-  const nested = projectUnder(root, directory) ?? projectUnder(root, projectDirectory)
-  if (nested) return nested
+export type Options = { projectsRoot?: string }
+
+function expandHome(p: string): string {
+  if (p === "~") return homedir()
+  if (p.startsWith("~/")) return join(homedir(), p.slice(2))
+  return p
+}
+
+export function resolveOptions(raw: Readonly<Record<string, any>> = {}): Options {
+  const root = typeof raw.projects_root === "string" && raw.projects_root.length > 0 ? expandHome(raw.projects_root) : undefined
+  return { projectsRoot: root }
+}
+
+// Project key for a location. With `projects_root` set, a directory anywhere under it maps to the
+// first path segment below the root (so a session rooted deep inside a project — e.g. a web UI
+// that roots sessions at <project>/data/…/session-<id>/ — still scopes to the project). Otherwise
+// the git root's basename; where there is no repo it falls back to the directory name.
+export function scopeOf(projectDirectory: string, directory: string, opts: Options = {}): string {
+  if (opts.projectsRoot) {
+    const nested = projectUnder(opts.projectsRoot, directory) ?? projectUnder(opts.projectsRoot, projectDirectory)
+    if (nested) return nested
+  }
   const fromProject = basename(projectDirectory || "")
   if (fromProject && fromProject !== "/") return fromProject
   return basename(directory || "") || "global"
@@ -261,7 +275,7 @@ const plugin: Plugin.Plugin = {
   id: "memory",
   async setup(ctx) {
     const directory = ctx.location.directory
-    const project = scopeOf(ctx.location.project.directory, directory)
+    const project = scopeOf(ctx.location.project.directory, directory, resolveOptions(ctx.options))
     const log = (message: string) => console.error(`[memory] ${message}`)
 
     // Surfaces a failure in-prompt so a broken memory layer is visible rather than
