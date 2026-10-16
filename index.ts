@@ -1,11 +1,11 @@
 // Cross-session, cross-project memory backed by SQLite.
 //
-// Retrieval is "inject everything relevant", not vector search: at this scale a
-// few dozen facts cost less to inject wholesale than an embedding round-trip
-// would, and it is deterministic. If a scope ever outgrows `max_inject_chars`,
-// add FTS5 over the same rows rather than reaching for a vector store.
+// Retrieval is "inject everything relevant", not vector search: injecting the
+// relevant rows wholesale is cheaper than an embedding round-trip and it is
+// deterministic (see docs/SDD.md → Decisions). If a scope outgrows
+// `max_inject_chars`, add FTS5 over the same rows rather than a vector store.
 //
-// Type-only import: Bun resolves bare specifiers from the symlink's real path, where no node_modules exists.
+// Type-only import: the plugin directory may have no node_modules of its own.
 // Plugin.define is an identity function, so the plain object is the same definition.
 // Everything else is a Bun/Node builtin for the same reason.
 import type { Plugin } from "@opencode/plugin"
@@ -225,8 +225,8 @@ function render(project: string, sessionID?: string): string {
   return lines.join("\n")
 }
 
-// A plain-text mirror of the DB, so the memory has a readable git history via
-// sync.sh. Written atomically; failures are non-fatal.
+// A plain-text mirror of the DB, so the memory can be read and version-controlled
+// as a file. Written atomically; failures are non-fatal.
 function exportMarkdown() {
   try {
     const rows = open()
