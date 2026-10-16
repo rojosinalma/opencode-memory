@@ -3,7 +3,7 @@
   "version": "0.2.0",
   "description": "OpenCode plugin: cross-session, cross-project memory in SQLite, injected into the system prompt",
   "author": "rojosinalma",
-  "license": "MIT",
+  "license": "AGPL-3.0-only",
   "type": "module",
   "main": "index.ts",
   "scripts": {
