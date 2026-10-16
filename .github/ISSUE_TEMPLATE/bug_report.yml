@@ -1,0 +1,50 @@
+name: Bug report
+description: Something does not work as documented
+title: "bug: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for the report. Strip anything private from memory contents and logs before pasting.
+  - type: input
+    id: version
+    attributes:
+      label: opencode-memory version
+      description: The tag or commit of your checkout (`git -C ~/.config/opencode/plugins/memory describe --tags`).
+      placeholder: v0.2.0
+    validations:
+      required: true
+  - type: input
+    id: opencode
+    attributes:
+      label: OpenCode and Bun versions
+      placeholder: opencode 2.0.30 / bun 1.4.2
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, what you got.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Tell the agent to remember a fact
+        2. Open a new session in another project
+        3. …
+  - type: textarea
+    id: config
+    attributes:
+      label: Plugin configuration
+      description: The `plugins[]` entry from `opencode.jsonc`, if any, and the `settings` rows you changed.
+      render: jsonc
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Relevant `[memory]` lines from the OpenCode server output.
+      render: text

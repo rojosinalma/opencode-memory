@@ -41,13 +41,26 @@ and pull request.
 ## Commits and PRs
 
 Plain, descriptive commit messages in the imperative ("Add FTS fallback for large scopes"). One
-logical change per commit. Open a pull request against `main`; `bun test` must pass.
+logical change per commit, **GPG-signed** (`git config commit.gpgsign true`). Open a pull request
+against `main`; the `run-tests` check must pass.
 
 ## Documentation
 
-- `README.md` — what it is, requirements, setup, license. Nothing else.
+- `README.md` — what it is, requirements, installation, usage, development, license. Nothing else.
 - `docs/configuration.md` — plugin options, runtime settings, environment.
 - `docs/SDD.md` — architecture, data model, flows, decisions, scope, operations.
 - `docs/troubleshooting.md` — symptoms and fixes.
+- `CHANGELOG.md` — Keep a Changelog; every user-visible change gets a line under *Unreleased*.
+- `SECURITY.md`, `CODE_OF_CONDUCT.md`, `.github/` — reporting path, conduct, issue and PR templates.
 
 A change in behaviour updates the matching file in the same commit.
+
+## Releasing
+
+Bump `version` in `package.json`, move the *Unreleased* section of `CHANGELOG.md` under the new
+version, commit, then create a signed tag and a GitHub release whose notes are that section:
+
+```sh
+git tag -s vX.Y.Z -m vX.Y.Z && git push --tags
+gh release create vX.Y.Z --title "opencode-memory X.Y.Z" --notes-file <section>
+```

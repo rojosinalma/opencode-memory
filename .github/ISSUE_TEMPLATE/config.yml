@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions and ideas
+    url: https://github.com/rojosinalma/opencode-memory/discussions
+    about: Ask a question or float an idea before it becomes a bug report or feature request.
+  - name: Security vulnerability
+    url: https://github.com/rojosinalma/opencode-memory/security/advisories/new
+    about: Report security issues privately — never in a public issue.
